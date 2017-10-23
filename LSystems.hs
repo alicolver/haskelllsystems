@@ -78,14 +78,38 @@ move 'F' ((x, y), angle) turn = ((newX, newY), angle)
 --  Method 1
 trace1 :: String -> Float -> Colour -> [ColouredLine]
 trace1 = error "TODO: implement trace1"
+{-
+trace1 [] angle colour         = []
+trace1 ('[' : cs) angle colour =
+  where
+    trace1' (']' : cs) angle colour = []
+    trace1' (c : cs) angle colour
+      = fst tState (fst (move c tState))
+trace1 listCommands@(c : cs) angle colour =
+-}
+
 
 -- |Trace lines drawn by a turtle using the given colour, following the
 --  commands in the string and assuming the given initial angle of rotation.
 --  Method 2
 trace2 :: String -> Float -> Colour -> [ColouredLine]
-trace2 = error "TODO: implement trace2"
-
-
+trace2 commands@(c : cs) ang colour
+  = trace2' commands [((0, 0), 90)] ((0, 0), 90)
+  where
+    trace2' :: String -> Stack -> TurtleState -> [ColouredLine]
+    trace2' ('[' : cs) tStateStack state
+      = trace2' cs (state : tStateStack) state
+    trace2' (']' : cs) (top : stack) state
+      = trace2' cs stack top
+    trace2' ('F' : cs) tStateStack state
+      = (fst state, fst state', colour) : trace2' cs tStateStack state'
+      where
+        state' = move 'F' state ang
+    trace2' (c : cs) tStateStack state
+      = trace2' cs tStateStack state'
+      where
+        state' = move c state ang
+    trace2' [] _ _ = []
 --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
 
 --  Some test systems.
