@@ -31,30 +31,32 @@ type ColouredLine
 
 -- |Returns the rotation angle for the given system.
 angle :: System -> Float
-angle = error "TODO: implement angle"
+angle (ang, bse, rle) = ang
 
 -- |Returns the base string for the given system.
 base :: System -> String
-base = error "TODO: implement base"
+base (ang, bse, rle) = bse
 
 -- |Returns the set of rules for the given system.
 rules :: System -> Rules
-rules = error "TODO: implement rules"
+rules (ang, bse, rle) = rle
 
 
 -- |Look up a character in the given set of rules.
 --
 --  Pre: the character exists in the set of rules.
 lookupChar :: Char -> Rules -> String
-lookupChar = error "TODO: implement lookupChar"
+lookupChar char rules = head [value | (i, value) <- rules, char == i]
 
 -- |Expand a command once using the given set of rules.
 expandOne :: Rules -> String -> String
-expandOne = error "TODO: implement expandOne"
+expandOne rules string = concat (map (flip lookupChar rules) string)
 
 -- |Expand a command `n' times using the given set of rules.
 expand :: Rules -> String -> Int -> String
-expand = error "TODO: implement expand"
+expand rules base 0 = base
+expand rules base 1 = expandOne rules base
+expand rules base n = expandOne rules (expand rules base (n - 1))
 
 -- |Move a turtle.
 --
@@ -62,7 +64,14 @@ expand = error "TODO: implement expand"
 --  * 'L' rotates left according to the given angle.
 --  * 'R' rotates right according to the given angle.
 move :: Char -> TurtleState -> Float -> TurtleState
-move = error "TODO: implement move"
+move 'L' (vertex, angle) turn = (vertex, (angle + turn))
+move 'R' (vertex, angle) turn = (vertex, (angle - turn))
+move 'F' ((x, y), angle) turn = ((newX, newY), angle)
+  where
+    newX       = x + cos angleToRad
+    newY       = y + sin angleToRad
+    angleToRad = (angle / 180) * pi
+
 
 -- |Trace lines drawn by a turtle using the given colour, following the
 --  commands in the string and assuming the given initial angle of rotation.
