@@ -86,22 +86,22 @@ trace1 commands ang colour
     trace1' :: String -> TurtleState -> ([(Vertex, Vertex)], String)
     trace1' [] _ = ([], [])
     trace1' ('[' : cs) state
-      = ((fst traceI ++ fst traceII), snd traceI)
+      = ((initialPoints ++ newPoints), initialCommands)
       where
-        traceI  = trace1' cs state
-        traceII = trace1' (snd traceI) state
+        (initialPoints, initialCommands) = trace1' cs state
+        (newPoints , _)                  = trace1' initialCommands state
     trace1' (']' : cs) state
       = ([], cs)
     trace1' ('F' : cs) state
-      = ((fst state, fst movement) : fst points, snd points)
+      = ((fst state, newPoint) : points, coms)
       where
-        points = trace1' cs movement
-        movement = move 'F' state ang
+        (points, coms)           = trace1' cs movement
+        movement@(newPoint, ang) = move 'F' state ang
     trace1' (c : cs) state
-      = (fst points, snd points)
+      = (points, commands)
       where
-        points = trace1' cs movement
-        movement = move c state ang
+        (points, commands) = trace1' cs movement
+        movement           = move c state ang
 
 -- |Trace lines drawn by a turtle using the given colour, following the
 --  commands in the string and assuming the given initial angle of rotation.
@@ -116,10 +116,10 @@ trace2 commands@(c : cs) ang colour
       = trace2' cs (state : tStateStack) state
     trace2' (']' : cs) (top : stack) state
       = trace2' cs stack top
-    trace2' ('F' : cs) tStateStack state
-      = (fst state, fst state', colour) : trace2' cs tStateStack state'
+    trace2' ('F' : cs) tStateStack state@(point, a)
+      = (point, newPoint, colour) : trace2' cs tStateStack state'
       where
-        state' = move 'F' state ang
+        state'@(newPoint, ang) = move 'F' state ang
     trace2' (c : cs) tStateStack state
       = trace2' cs tStateStack state'
       where
