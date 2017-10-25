@@ -74,24 +74,39 @@ move 'F' ((x, y), angle) turn = ((newX, newY), angle)
 
 
 -- |Trace lines drawn by a turtle using the given colour, following the
---  commands in the string and assuming the given initial angle of rotation.
---  Method 1
+-- commands in the string and assuming the given initial angle of rotation.
+-- Method 1 (Recursion)
+-- Initial TurtleState ((0, 0), 90)
 trace1 :: String -> Float -> Colour -> [ColouredLine]
-trace1 = error "TODO: implement trace1"
-{-
-trace1 [] angle colour         = []
-trace1 ('[' : cs) angle colour =
+trace1 commands ang colour
+  = [(s, e, colour) | (s, e) <- points]
   where
-    trace1' (']' : cs) angle colour = []
-    trace1' (c : cs) angle colour
-      = fst tState (fst (move c tState))
-trace1 listCommands@(c : cs) angle colour =
--}
-
+    (points, _)  = trace1' commands initial
+    initial = ((0, 0), 90)
+    trace1' :: String -> TurtleState -> ([(Vertex, Vertex)], String)
+    trace1' [] _ = ([], [])
+    trace1' ('[' : cs) state
+      = ((fst traceI ++ fst traceII), snd traceI)
+      where
+        traceI  = trace1' cs state
+        traceII = trace1' (snd traceI) state
+    trace1' (']' : cs) state
+      = ([], cs)
+    trace1' ('F' : cs) state
+      = ((fst state, fst movement) : fst points, snd points)
+      where
+        points = trace1' cs movement
+        movement = move 'F' state ang
+    trace1' (c : cs) state
+      = (fst points, snd points)
+      where
+        points = trace1' cs movement
+        movement = move c state ang
 
 -- |Trace lines drawn by a turtle using the given colour, following the
 --  commands in the string and assuming the given initial angle of rotation.
---  Method 2
+--  Method 2 (Stacks)
+-- initial TurtleState ((0, 0), 90)
 trace2 :: String -> Float -> Colour -> [ColouredLine]
 trace2 commands@(c : cs) ang colour
   = trace2' commands [((0, 0), 90)] ((0, 0), 90)
@@ -109,7 +124,8 @@ trace2 commands@(c : cs) ang colour
       = trace2' cs tStateStack state'
       where
         state' = move c state ang
-    trace2' [] _ _ = []
+    trace2' [] _ _
+      = []
 --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
 
 --  Some test systems.
