@@ -11,6 +11,8 @@ angleTestCases
     , (1, "", []) ==> 1
     , triangle    ==> 90
     , arrowHead   ==> 60
+    , (290, "ABC", []) ==> 290
+    , (9.999999999, "", []) ==> 9.999999999
     ]
 
 baseTestCases
@@ -18,6 +20,8 @@ baseTestCases
     , cross        ==> "M-M-M-M"
     , triangle     ==> "-M"
     , arrowHead    ==> "N"
+    , (0, "", [])  ==> ""
+    , (9, "+-+-+", []) ==> "+-+-+"
     ]
 
 rulesTestCases
@@ -27,6 +31,10 @@ rulesTestCases
                 ]
     , (0, "", [ ('M', "N") ])
         ==> [ ('M', "N") ]
+    , (10, "", [('z', "zzz")])
+        ==> [ ('z', "zzz") ]
+    , (10, "", [('z', "zzz"), ('a', "a")])
+        ==> [ ('z', "zzz"), ('a', "a") ]
     ]
 
 {- Note: these test cases use angle/base/rules, and will fail the test
@@ -42,6 +50,7 @@ lookupCharTestCases
       ==> "M+N++N-M--MM-N+"
     , ('+', (rules triangle))
       ==> "+"
+    , ('-', [('-', "+++")]) ==> "+++"
     ]
 
 expandOneTestCases
