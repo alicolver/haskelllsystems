@@ -83,20 +83,25 @@ trace1 commands ang colour
   where
     (points, _)  = trace1' commands initial
     initial = ((0, 0), 90)
+
     trace1' :: String -> TurtleState -> ([(Vertex, Vertex)], String)
     trace1' [] _ = ([], [])
+
     trace1' ('[' : cs) state
       = ((initialPoints ++ newPoints), initialCommands)
       where
         (initialPoints, initialCommands) = trace1' cs state
         (newPoints , _)                  = trace1' initialCommands state
+
     trace1' (']' : cs) state
       = ([], cs)
+
     trace1' ('F' : cs) state
       = ((fst state, newPoint) : points, coms)
       where
         (points, coms)           = trace1' cs movement
         movement@(newPoint, ang) = move 'F' state ang
+
     trace1' (c : cs) state
       = (points, commands)
       where
@@ -112,18 +117,23 @@ trace2 commands@(c : cs) ang colour
   = trace2' commands [((0, 0), 90)] ((0, 0), 90)
   where
     trace2' :: String -> Stack -> TurtleState -> [ColouredLine]
+
     trace2' ('[' : cs) tStateStack state
       = trace2' cs (state : tStateStack) state
+
     trace2' (']' : cs) (top : stack) state
       = trace2' cs stack top
+
     trace2' ('F' : cs) tStateStack state@(point, a)
       = (point, newPoint, colour) : trace2' cs tStateStack state'
       where
         state'@(newPoint, ang) = move 'F' state ang
+
     trace2' (c : cs) tStateStack state
       = trace2' cs tStateStack state'
       where
         state' = move c state ang
+        
     trace2' [] _ _
       = []
 --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
