@@ -83,19 +83,24 @@ trace commands@(c : cs) ang colour
   = trace' commands [((0, 0), 90)] ((0, 0), 90) colour
   where
     trace' :: String -> Stack -> TurtleState -> Colour -> [ColouredLine]
+    
     trace' ('[' : cs) tStateStack state col
       = trace' cs (state : tStateStack) state col
+
     trace' (']' : cs) (top : stack) state col
       = trace' cs stack top col
+
     trace' ('F' : cs) tStateStack state@(point, a) colour
       = (point, newPoint, nColour) : trace' cs tStateStack state' nColour
       where
         nColour                = rgbColour colour
         state'@(newPoint, ang) = move 'F' state ang
+
     trace' (c : cs) tStateStack state col
       = trace' cs tStateStack state' col
       where
         state' = move c state ang
+
     trace' [] _ _ _
       = []
 
