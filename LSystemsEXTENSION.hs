@@ -88,8 +88,9 @@ trace commands@(c : cs) ang colour
     trace' (']' : cs) (top : stack) state col
       = trace' cs stack top col
     trace' ('F' : cs) tStateStack state@(point, a) colour
-      = (point, newPoint, newColour colour) : trace' cs tStateStack state' (newColour colour)
+      = (point, newPoint, nColour) : trace' cs tStateStack state' nColour
       where
+        nColour                = rgbColour colour
         state'@(newPoint, ang) = move 'F' state ang
     trace' (c : cs) tStateStack state col
       = trace' cs tStateStack state' col
@@ -98,8 +99,9 @@ trace commands@(c : cs) ang colour
     trace' [] _ _ _
       = []
 
-newColour :: Colour -> Colour
-newColour (r, g, b)
+-- Functon creates LSystem with alternating line colours of red, green and blue
+rgbColour :: Colour -> Colour
+rgbColour (r, g, b)
   | r > 0.0   = (0.0, 0.0, 1.0)
   | g > 0.0   = (1.0, 0.0, 0.0)
   | b > 0.0   = (0.0, 1.0, 0.0)
